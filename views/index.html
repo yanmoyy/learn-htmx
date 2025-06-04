@@ -8,6 +8,7 @@
         <meta name="keywords" content="learn, htmx">
         <meta name="description" content="this is why we should use htmx">
         <script src="https://unpkg.com/htmx.org/dist/htmx.min.js">
+        
 </script>
     </head>
     <body>
@@ -27,6 +28,7 @@
     </body>
 </html>
 {{ end }}
+
 {{ block "form" . }}
 <form hx-swap="outerHTML" hx-post="/contacts">
     name:
@@ -42,18 +44,43 @@
            type="text"
            name="email" />
     {{ if .Errors.email }}
-    <div style="color: red">{{ .Errors.email }}</div>
+    <div style="color: red">
+        {{ .Errors.email }}
+    </div>
     {{ end }}
-    <button type="submit">Create Contact</button>
+    <button type="submit">
+        Create Contact
+    </button>
 </form>
 {{ end }}
+
 {{ block "display" . }}
 <div id="contacts" style="display: flex; flex-direction: column;">
     {{ range .Contacts }}
-    <div>
-        name: <span>{{ .Name }}</span>
-        Email: <span>{{ .Email }}</span>
-    </div>
+    {{ template "contact" . }}
     {{ end }}
+</div>
+{{ end }}
+
+{{ block "contact" . }}
+<div id="contact-{{ .Id }}" style="display: flex">
+    <div hx-target="#contact-{{ .Id }}"
+         hx-swap="outerHTML"
+         hx-delete="/contacts/{{ .Id }}"
+         style="width: 1rem;
+                cursor: pointer">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path fill="none" d="M0 0h24v24H0z" />
+            <path d="M4 2h16a1 1 0 011 1v1a1 1 0 01-1 1H4a1 1 0 01-1-1V3a1 1 0 011-1zM3 6h18v16a1 1 0 01-1 1H4a1 1 0 01-1-1V6zm3 3v9a1 1 0 002 0v-9a1 1 0 00-2 0zm5 0v9a1 1 0 002 0v-9a1 1 0 00-2 0zm5 0v9a1 1 0 002 0v-9a1 1 0 00-2 0z" />
+        </svg>
+    </div>
+    name: <span>{{ .Name }}</span>
+    Email: <span>{{ .Email }}</span>
+</div>
+{{ end }}
+
+{{ block "oob-contact" . }}
+<div id="contacts" hx-swap-oob="afterbegin">
+    {{ template "contact" . }}
 </div>
 {{ end }}
