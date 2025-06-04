@@ -4,6 +4,9 @@ import (
 	"html/template"
 	"io"
 	"strconv"
+	"time"
+
+	"slices"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -105,6 +108,9 @@ func main() {
 	page := newPage()
 	e.Renderer = newTemplate()
 
+	e.Static("/images", "images")
+	e.Static("/css", "css")
+
 	e.GET("/", func(c echo.Context) error {
 		return c.Render(200, "index", page)
 	})
@@ -130,6 +136,8 @@ func main() {
 	})
 
 	e.DELETE("/contacts/:id", func(c echo.Context) error {
+		time.Sleep(3 * time.Second)
+
 		idStr := c.Param("id")
 		id, err := strconv.Atoi(idStr)
 		if err != nil {
@@ -141,7 +149,7 @@ func main() {
 			return c.String(404, "Contact not found")
 		}
 
-		page.Data.Contacts = append(page.Data.Contacts[:index], page.Data.Contacts[index+1:]...)
+		page.Data.Contacts = slices.Delete(page.Data.Contacts, index, index+1)
 
 		return c.NoContent(200)
 	})
